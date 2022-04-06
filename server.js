@@ -11,6 +11,8 @@ const productsRoutes = require('./routes/products');
 const cartRoutes = require('./routes/cart')
 const stripeRoutes = require('./routes/stripe')
 const userRoutes = require('./routes/users');
+const orderRoutes = require('./routes/orders');
+
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 
@@ -46,7 +48,7 @@ app.use('/api/v1/shop/users', userRoutes);
 
 app.use('/api/v1/shop/cart', cartRoutes);
 
-app.use('/api/v1/shop/create-payment-intent', stripeRoutes);
+app.use('/api/v1/shop/checkout', stripeRoutes);
 
 app.listen(PORT, () => {
     console.log(`This app is listening on port: ${PORT}`)
