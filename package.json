@@ -32,7 +32,6 @@
     "passport-local": "^1.0.0",
     "sessions": "^0.0.2-7",
     "stripe": "^8.213.0",
-    "uuidv4": "^6.2.12",
     "validator": "^13.7.0"
   }
 }
