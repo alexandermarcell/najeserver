@@ -1,12 +1,10 @@
-const Products = require('../models/productModel');
+const Item = require('../models/itemModel');
 
 //get all items
-const getProducts =  async(req, res) => {
+const getItems =  async(req, res) => {
     try {
-        const productData = await Products.find();
-        res.status(200).json({
-            productData
-        })
+        const items = await Item.find({});
+        res.status(200).send(items)
     } catch (error) {
         res.status(400).send(error)
     }
@@ -83,7 +81,7 @@ const deleteProduct = async (req, res) => {
 
 
 module.exports = { 
-    getProducts, 
+    getItems, 
     addProduct,
     getSpecificProduct,
     updateProduct,

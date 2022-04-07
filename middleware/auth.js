@@ -15,7 +15,7 @@ const auth = async(req, res, next) =>{
     next()
   } catch (error) {
     res.status(401).send({
-      Error: "Authentication Required"
+      error: "Authentication Required"
     })
   }
 }

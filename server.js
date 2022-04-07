@@ -7,7 +7,7 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 5050;
 
-const productsRoutes = require('./routes/products');
+const itemRoutes = require('./routes/item');
 const cartRoutes = require('./routes/cart')
 const stripeRoutes = require('./routes/stripe')
 const userRoutes = require('./routes/users');
@@ -42,11 +42,13 @@ app.use(express.static("public"));
 
 app.use(express.urlencoded({extended: false}))
 
-app.use('/api/v1/shop/items', productsRoutes);
+app.use('/api/v1/shop/items', itemRoutes);
 
 app.use('/api/v1/shop/users', userRoutes);
 
 app.use('/api/v1/shop/cart', cartRoutes);
+
+app.use('/api/v1/shop/orders', orderRoutes);
 
 app.use('/api/v1/shop/checkout', stripeRoutes);
 

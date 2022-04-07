@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const ObjectID = mongoose.Schema.Types.ObjectId
 
-const productsSchema = new mongoose.Schema({
+const itemSchema = mongoose.Schema({
     owner: {
         type: ObjectID,
         required: true,
@@ -12,7 +12,7 @@ const productsSchema = new mongoose.Schema({
         required: [true, 'Please add a image']
     },
     //could add category type string, require
-    productName: {
+    name: {
         type: String,
         required: [true, 'Please add a product name']
     },
@@ -28,4 +28,5 @@ const productsSchema = new mongoose.Schema({
     timestamps: true,
 })
 
-module.exports = mongoose.model('Products', productsSchema)
+const Item = mongoose.model('Item', itemSchema);
+module.exports = Item

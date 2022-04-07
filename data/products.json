@@ -1,20 +1,20 @@
 [
   {
-    "image": "http://localhost:5050/images/image1.jpg",
-    "productName": "Clay Cleanser",
-    "description": "On a gusty day in Southern Utah, a group of 25 daring mountain bikers blew the doors off what is possible on two wheels, unleashing some of the biggest moments the sport has ever seen. While mother nature only allowed for one full run before the conditions made it impossible to ride, that was all that was needed for event veteran Kyle Strait, who won the event for the second time -- eight years after his first Red Cow Rampage title",
+    "image": "http://localhost:5050/images/image0.jpg",
+    "name": "Clay Cleanser",
+    "description": "If you are fed up with chemical-laden shampoos, incorporate clay into your hair care regimen. Clay washes are natural and free of harsh cleansing agents, preservatives, fragrances, mineral oils, and other synthetic ingredients. Clay provides a nutrient boost to your hair and leaves it feeling soft and easier to detangle.",
     "price": 1199
   },
   {
-    "image": "http://localhost:5050/images/image2.jpg",
-    "productName": "Herb Infused Oil",
-    "description": "On a gusty day in Southern Utah, a group of 25 daring mountain bikers blew the doors off what is possible on two wheels, unleashing some of the biggest moments the sport has ever seen. While mother nature only allowed for one full run before the conditions made it impossible to ride, that was all that was needed for event veteran Kyle Strait, who won the event for the second time -- eight years after his first Red Cow Rampage title",
+    "image": "http://localhost:5050/images/image1.jpg",
+    "name": "Herb Infused Oil",
+    "description": "Herbal hair oils are natural oil products with essential properties to treat hair problems like thinning of hair and dry or flaky scalp.",
     "price": 1599
   },
   {
     "image": "http://localhost:5050/images/image3.jpg",
-    "productName": "Curl Enhancing Moisturizer",
-    "description": "On a gusty day in Southern Utah, a group of 25 daring mountain bikers blew the doors off what is possible on two wheels, unleashing some of the biggest moments the sport has ever seen. While mother nature only allowed for one full run before the conditions made it impossible to ride, that was all that was needed for event veteran Kyle Strait, who won the event for the second time -- eight years after his first Red Cow Rampage title",
+    "name": "Curl Enhancing Moisturizer",
+    "description": "To achieve the perfect coil, hair needs an extreme moisture experience. One that's packed with intense nourishing moisture and softness that you can see and feel. Enhance your coils with this buttery styling cream, that's blended with our Coco Creme recipe and helps to add long-lasting definition, mega-watt shine, and touchable softness. Packaging May Vary. What you receive may not be what is reflected on site.",
     "price": 1199
   }
 ]
