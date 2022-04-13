@@ -10,7 +10,7 @@ router.get('/', getCart);
 router.post('/', addToCart);
 
 //delete item from cart
-router.delete('/', auth, deleteCartItems);
+router.delete('/', deleteCartItems);
 
 
 module.exports = router;
