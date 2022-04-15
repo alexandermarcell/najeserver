@@ -3,7 +3,7 @@ const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
 
 
-router.post("/", (req, res) => {
+router.post("/payment", (req, res) => {
   stripe.charges.create(
     {
       source: req.body.tokenId,

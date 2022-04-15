@@ -81,28 +81,26 @@ const addToCart = asyncHandler( async (req, res) => {
     }
   });
 
-
+//deletes a cart item
 const deleteCartItems = asyncHandler( async(req, res) => {
     //const owner = req.user._id;
     const owner = "624708907e942ff21cb90776";
 
-    const itemId = req.query.itemId;
+    const itemId = req.params.id;
     
     try {
         let cart = await Cart.findOne({ owner });
-
-        const itemIndex = cart.items.findIndex((item) => {
-            item.itemId == itemId;
-        })
+        const itemIndex = cart.items.findIndex((item) => item.itemId == itemId);
+    
         if (itemIndex > -1){
-            let item = cart.itmes[itemIndex];
+            let item = cart.items[itemIndex];
             cart.bill -= item.quantity * item.price;
         
             if (cart.bill < 0) {
                 cart.bill = 0
             }
 
-            cart.item.splice(itemIndex, 1);
+            cart.items.splice(itemIndex, 1);
             cart.bill = cart.items.reduce((acc, curr) => {
                 return acc + curr.quantity * curr.price;
             }, 0)
@@ -119,8 +117,55 @@ const deleteCartItems = asyncHandler( async(req, res) => {
 });
 
 
+const updateItemsInCart = asyncHandler( async(req, res) => {
+    //const owner = req.user._id;
+  const owner = "624708907e942ff21cb90776";
+
+  const itemId = req.params.id;
+
+  const { quantity } = req.body;
+  
+  try {
+      let cart = await Cart.findOne({ owner });
+      const itemIndex = cart.items.findIndex((item) => item.itemId == itemId);
+      
+      if (itemIndex > -1){
+        let item = cart.items[itemIndex];
+        if (quantity === 1) {
+          item.quantity += quantity;
+
+          cart.bill = cart.items.reduce((acc, curr) => {
+            return acc + curr.quantity * curr.price;
+          }, 0)
+  
+          await cart.save();
+          res.status(200).send(cart);
+        } 
+        if (quantity === -1) {
+          item.quantity --;
+          
+          cart.bill = cart.items.reduce((acc, curr) => {
+            return acc + curr.quantity * curr.price;
+          }, 0)
+
+          await cart.save();
+          res.status(200).send(cart);
+        }
+      } else {
+        res.status(404).send({
+          message: 'item not found'
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(400).send();
+    }
+});
+
+
 module.exports = {
     getCart,
     addToCart,
-    deleteCartItems
+    deleteCartItems,
+    updateItemsInCart,
 }
