@@ -132,7 +132,7 @@ const updateItemsInCart = asyncHandler( async(req, res) => {
       if (itemIndex > -1){
         let item = cart.items[itemIndex];
         if (quantity === 1) {
-          item.quantity += quantity;
+          item.quantity ++;
 
           cart.bill = cart.items.reduce((acc, curr) => {
             return acc + curr.quantity * curr.price;
