@@ -23,18 +23,20 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Please add a e-mail address'],
         unique: true,
         lowercase: true,
-         validate(value) {
-             if(!validator.isEmail(value)){
-                 throw new Error('E-mail is invalid')
-             }
-         }
+        validate(value) {
+            if(!validator.isEmail(value))
+            {
+                throw new Error('E-mail is invalid')
+            }
+        }
     },
     password: {
         type: String,
         required: [true, 'Please add a password'],
         unique: true,
         validate(value){
-            if (value.toLowerCase().includes('password')){
+            if(value.toLowerCase().includes('password'))
+            {
                 throw new Error("Password musn't be be password")
             }
         }
@@ -48,6 +50,7 @@ const userSchema = new mongoose.Schema({
 }, {
     timestamp: true
 })
+
 //added to generate Auth token
 userSchema.methods.generateAuthToken = async function () {
     const user = this
