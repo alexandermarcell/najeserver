@@ -4,6 +4,7 @@ const connectDB = require('./config/db');
 
 const cors = require('cors');
 const express = require('express');
+const Bodyparser = require('body-parser')
 const app = express();
 const PORT = process.env.PORT || 5050;
 
@@ -19,6 +20,11 @@ const MongoStore = require('connect-mongo');
 connectDB();
 
 app.use(cors());
+
+//Bodyparser middleware
+app.use(Bodyparser.urlencoded({
+    extended: false
+}));
   
 // Include express-session middleware (with additional config options required for Passport session)
 app.use(session({ 
@@ -50,8 +56,9 @@ app.use('/api/v1/shop/cart', cartRoutes);
 
 app.use('/api/v1/shop/orders', orderRoutes);
 
-app.use('/api/v1/shop/checkout', stripeRoutes);
+//app.use('/api/v1/shop/checkout', stripeRoutes);
+app.use('/api/v1/shop/create-payment-intent', stripeRoutes);
 
 app.listen(PORT, () => {
-    console.log(`This app is listening on port: ${PORT}`)
+    console.log(`This server is running on port: ${PORT}`)
 });

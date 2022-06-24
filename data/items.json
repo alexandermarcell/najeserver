@@ -1,0 +1,34 @@
+[
+    {
+      "id": "38d4bf61-88e6-42fe-a55d-d45189e56bfc",
+      "name": "Earthen Bottle",
+      "href": "#",
+      "price": "$48",
+      "image": "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg",
+      "imageAlt": "Tall slender porcelain bottle with natural clay textured body and cork stopper."
+    },
+    {
+      "id": "aee4a29a-0da0-4167-b84a-d0e5aad262c5",
+      "name": "Nomad Tumbler",
+      "href": "#",
+      "price": "$35",
+      "image": "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-02.jpg",
+      "imageAlt": "Olive drab green insulated bottle with flared screw lid and flat top."
+    },
+    {
+      "id": "b4d0da80-dc14-4d4d-ba1f-b7e89fe7ebb9",
+      "name": "Focus Paper Refill",
+      "href": "#",
+      "price": "$89",
+      "image": "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-03.jpg",
+      "imageAlt": "Person using a pen to cross a task off a productivity paper card."
+    },
+    {
+      "id": "b0d69b8d-6a9a-489d-827c-4687f2a8d64b",
+      "name": "Machined Mechanical Pencil",
+      "href": "#",
+      "price": "$35",
+      "image": "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-04.jpg",
+      "imageAlt": "Hand holding black machined steel mechanical pencil with brass tip and top."
+    }
+  ]
