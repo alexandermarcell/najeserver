@@ -10,12 +10,13 @@ const PORT = process.env.PORT || 5050;
 
 const itemRoutes = require('./routes/item');
 const cartRoutes = require('./routes/cart')
-const stripeRoutes = require('./routes/stripe')
 const userRoutes = require('./routes/users');
 const orderRoutes = require('./routes/orders');
 
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
+
+const createCheckoutSession = require('./api/checkout')
 
 connectDB();
 
@@ -40,7 +41,7 @@ app.use(function(req, res, next) {
     next();
 });
   
-require('dotenv').config();
+require('dotenv').config({ path: './.env' });
 
 app.use(express.json());
 
@@ -56,8 +57,7 @@ app.use('/api/v1/shop/cart', cartRoutes);
 
 app.use('/api/v1/shop/orders', orderRoutes);
 
-//app.use('/api/v1/shop/checkout', stripeRoutes);
-app.use('/api/v1/shop/create-payment-intent', stripeRoutes);
+app.post('/api/v1/shop/create-checkout-session', createCheckoutSession);
 
 app.listen(PORT, () => {
     console.log(`This server is running on port: ${PORT}`)

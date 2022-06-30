@@ -11,6 +11,8 @@ const jwt = require('jsonwebtoken');
 const registerUser =  asyncHandler(async (req, res) => {
     const { name, phone, address, email, password } = new User(req.body)
 
+    console.log('inputs',req.body)
+
     if( !name || !phone || !address || !email || !password ) {
         res.status(400)
         throw new Error('Please add all fields')
@@ -22,13 +24,13 @@ const registerUser =  asyncHandler(async (req, res) => {
         res.status(400)
         throw new Error('User already exists')
     }
+    console.log('already Exists? : ',userExist)
 
-    //hash pasword
+    //hash the pasword
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     //create user
-
     const user = await User.create({
         name,
         phone,
@@ -36,13 +38,15 @@ const registerUser =  asyncHandler(async (req, res) => {
         email,
         password: hashedPassword
     })
-    console.log("user: ", user)
+    console.log('new User: ', user)
 
     if(user) {
         res.status(201).json({
             _id: user.id,
             name: user.name,
+            phone: user.phone,
             email: user.email,
+            address: user.address,
             token: generateToken(user._id)
         })
     } else {
@@ -56,12 +60,12 @@ const registerUser =  asyncHandler(async (req, res) => {
 //Post
 
 const loginUser =  asyncHandler( async(req, res) => {
+
     const { email, password } = req.body;
 
-    //check for user email
     const user = await User.findOne({ email });
 
-    if(bcrypt.compare(password, user.password)) {
+    if(user && (bcrypt.compare(password, user.password))) {
         res.status(200).json({
             _id: user._id,
             name: user.name,
@@ -75,15 +79,6 @@ const loginUser =  asyncHandler( async(req, res) => {
             "message":"Something Went Wrong"
         })
     }
-
-    // try {
-    //     const user = await User.findByCredentials(req.body.email, req.body.password)
-    //     const token = await user.generateAuthToken()
-    //     res.send({ user, token })
-    // } catch (error) {
-    //     console.log(error)
-    //     res.status(400).send(error)
-    // }
 })
 
 const logOutUser =  asyncHandler(async (req, res) => {
@@ -112,12 +107,14 @@ const logOutAll = asyncHandler(async (req, res) => {
 //Private
 //get
 const getMe = asyncHandler( async(req, res) => {
-    const { _id, name, email, token } = await User.findById(req.user.id)
+    const { _id, name, email, phone, address, token } = await User.findById(req.user.id)
 
     res.status(200).json({
         id: _id,
         name,
         email,
+        phone,
+        address,
         token,
     })
 })
