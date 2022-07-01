@@ -4,67 +4,63 @@ const connectDB = require('./config/db');
 
 const cors = require('cors');
 const express = require('express');
+const Bodyparser = require('body-parser')
 const app = express();
 const PORT = process.env.PORT || 5050;
-const productsRoutes = require('./routes/products');
-const shoppingCartRoutes = require('./routes/shoppingCart')
+
+const itemRoutes = require('./routes/item');
+const cartRoutes = require('./routes/cart')
 const userRoutes = require('./routes/users');
-const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
+const orderRoutes = require('./routes/orders');
+
+const session = require('express-session');
+const MongoStore = require('connect-mongo');
+
+const createCheckoutSession = require('./api/checkout')
 
 connectDB();
 
 app.use(cors());
 
-app.use(express.json());
+//Bodyparser middleware
+app.use(Bodyparser.urlencoded({
+    extended: false
+}));
+  
+// Include express-session middleware (with additional config options required for Passport session)
+app.use(session({ 
+    secret: process.env.SESSION_SECRET, 
+    resave: false, 
+    saveUninitialized: true, 
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
+    cookie: { maxAge: 180 * 60 * 3000 }
+}));
+
+app.use(function(req, res, next) {
+    res.locals.session = req.session;
+    next();
+});
+  
+require('dotenv').config({ path: './.env' });
+
+app.use(express.json({
+    verify: (req, res, buffer) => req['rawBody'] = buffer,
+}));
 
 app.use(express.static("public"));
 
 app.use(express.urlencoded({extended: false}))
 
+app.use('/api/v1/shop/items', itemRoutes);
 
-//Stripe API 
-app.post('/create-checkout-session', async (req, res) => {
-    const session = await stripe.checkout.sessions.create({
-        customer_id: 'id',
-        billing_address_collection: 'auto',
-        shipping_address_collection: {
-            allowed_countries: ['US', 'CA'],
-        },
-        line_items: [
-            {
-                price: '{{PRICE_ID}}',
-                quantity: 1,
-            },
-        ],
-        mode: 'payment',
-        succes_url: `${process.env.CLIENT_URL}? success=true`,
-        cancel_url: `${process.env.CLIENT_URL}? canceled=true`,
-        automatic_tax: {enabled: true},
-    });
-
-    res.redirect(303, session.url);
-});
-
-app.use('/api/v1/shop/items', productsRoutes);
 app.use('/api/v1/shop/users', userRoutes);
-app.use('/api/v1/shop/cart', shoppingCartRoutes);
 
+app.use('/api/v1/shop/cart', cartRoutes);
 
-// if (process.env.NODE_ENV === 'production') {
-//     app.use(express.static(path.join(__dirname, '../frontend/build')))
+app.use('/api/v1/shop/orders', orderRoutes);
 
-//     app.get('*', (req, res) => {
-//         res.sendFile(
-//             path.resolve(__dirname, '../','frontend', 'build', 'index.html')
-//         )
-//     })
-// }else {
-//     app.get('/', (req, res) => {
-//         res.send('Please set to production')
-//     })
-// }
-
+app.post('/api/v1/shop/create-checkout-session', createCheckoutSession);
 
 app.listen(PORT, () => {
-    console.log(`This app is listening on port: ${PORT}`)
+    console.log(`This server is running on port: ${PORT}`)
 });

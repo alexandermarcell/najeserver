@@ -1,63 +1,171 @@
-
 const asyncHandler = require('express-async-handler');
-const Cart = require('../models/shoppingCartModel');
-const Product = require('../models/productModel');
+const Cart = require('../models/cartModel');
+const Item = require('../models/itemModel');
+
 
 //get all shopping cart items
 const getCart = asyncHandler( async (req, res) => {
-    if(!req.session.cart) {
-        return res.render('/cart', {products: null});
+
+    const owner = "624708907e942ff21cb90776";
+    //const owner = req.user._id;
+
+    try {
+        const cart = await Cart.findOne({ owner });
+        if (cart) {
+            res.status(200).send(cart);
+        } else {
+            res.send({
+                'message': 'The cart is empty'
+            });
+        }
+    } catch (error) {
+        res.status(500).send(error)
     }
-    const cart = new Cart(req.session.cart);
-    return res.render('shop/cart', {products: cart.generateArray(), totalPrice: cart.totalPrice});
-})
+});
 
 //add to cart
 const addToCart = asyncHandler( async (req, res) => {
-    const { productId, quantity, productName, price } = req.body;
 
-    const userId = {}
-
+    //const owner = req.user._id;
+    const owner = "624708907e942ff21cb90776";
+    
+    const { itemId, quantity } = req.body;
+  
     try {
-        let cart = await Cart.findOne({ userId });
-
-        if (cart) {
-            //cart exists for user
-            let itemIndex = cart.products.findIndex( p => p.productId === productId);
-
-            if (itemIndex > -1) {
-                //product exists in the cart, update teh quantity
-                let productItem = cart.products[itemIndex];
-                productItem.quantity = quantity;
-                cart.products[itemIndex] =  productItem;
-            } else {
-                //product does not exist in cart, add new item
-                cart.products.push({ productId, quantity, productName, price });
-            }
-            cart = await cart.save();
+      const cart = await Cart.findOne({ owner });
+      const item = await Item.findOne({ _id: itemId });
+      if (!item) {
+        res.status(404).send({ message: "item not found" });
+        return;
+      }
+      const price = item.price;
+      const name = item.name;
+      const image = item.image;
+      //If cart already exists for user,
+      if (cart) {
+        const itemIndex = cart.items.findIndex((item) => item.itemId == itemId);
+        //check if product exists or not
+  
+        if (itemIndex > -1) {
+          let item = cart.items[itemIndex];
+          item.quantity += quantity;
+  
+          cart.bill = cart.items.reduce((acc, curr) => {
+              return acc + curr.quantity * curr.price;
+          },0)
+          
+          cart.items[itemIndex] = item;
+          await cart.save();
+          res.status(200).send(cart);
         } else {
-            //no cart for user, create new cart
-            const newCart = await Cart.create({
-                userId,
-                products: [
-                    {
-                        productId, quantity, productName, price
-                    }
-                ]
-            });
+          cart.items.push({ itemId, name, image, quantity, price });
+          cart.bill = cart.items.reduce((acc, curr) => {
+              return acc + curr.quantity * curr.price;
+          },0)
+  
+          await cart.save();
+          res.status(200).send(cart);
+        }
+      } else {
+        //no cart exists, create one
+        const newCart = await Cart.create({
+          owner,
+          items: [{ itemId, name, image, quantity, price }],
+          bill: quantity * price,
+        });
+        return res.status(201).send(newCart);
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).send("something went wrong");
+    }
+  });
 
-            return res.status(201).send(newCart);
+//deletes a cart item
+const deleteCartItems = asyncHandler( async(req, res) => {
+    //const owner = req.user._id;
+    const owner = "624708907e942ff21cb90776";
+
+    const itemId = req.params.id;
+    
+    try {
+        let cart = await Cart.findOne({ owner });
+        const itemIndex = cart.items.findIndex((item) => item.itemId == itemId);
+    
+        if (itemIndex > -1){
+            let item = cart.items[itemIndex];
+            cart.bill -= item.quantity * item.price;
+        
+            if (cart.bill < 0) {
+                cart.bill = 0
+            }
+
+            cart.items.splice(itemIndex, 1);
+            cart.bill = cart.items.reduce((acc, curr) => {
+                return acc + curr.quantity * curr.price;
+            }, 0)
+            cart = await cart.save();
+
+            res.status(200).send(cart);
+        } else {
+            res.status(404).send("item not found");
         }
     } catch (error) {
-        res.status(500).json({
-            'message': 'Something went wrong'
-        })
+        console.log(error);
+        res.status(400).send();
     }
+});
 
+
+const updateItemsInCart = asyncHandler( async(req, res) => {
+    //const owner = req.user._id;
+  const owner = "624708907e942ff21cb90776";
+
+  const itemId = req.params.id;
+
+  const { quantity } = req.body;
+  
+  try {
+      let cart = await Cart.findOne({ owner });
+      const itemIndex = cart.items.findIndex((item) => item.itemId == itemId);
+      
+      if (itemIndex > -1){
+        let item = cart.items[itemIndex];
+        if (quantity === 1) {
+          item.quantity ++;
+
+          cart.bill = cart.items.reduce((acc, curr) => {
+            return acc + curr.quantity * curr.price;
+          }, 0)
+  
+          await cart.save();
+          res.status(200).send(cart);
+        } 
+        if (quantity === -1) {
+          item.quantity --;
+          
+          cart.bill = cart.items.reduce((acc, curr) => {
+            return acc + curr.quantity * curr.price;
+          }, 0)
+
+          await cart.save();
+          res.status(200).send(cart);
+        }
+      } else {
+        res.status(404).send({
+          message: 'item not found'
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(400).send();
+    }
 });
 
 
 module.exports = {
     getCart,
-    addToCart
+    addToCart,
+    deleteCartItems,
+    updateItemsInCart,
 }

@@ -87,11 +87,16 @@ module.exports = {
     ScheduledQueryRuns: require('./resources/Sigma/ScheduledQueryRuns'),
   }),
   Terminal: resourceNamespace('terminal', {
+    Configurations: require('./resources/Terminal/Configurations'),
     ConnectionTokens: require('./resources/Terminal/ConnectionTokens'),
     Locations: require('./resources/Terminal/Locations'),
     Readers: require('./resources/Terminal/Readers'),
   }),
   TestHelpers: resourceNamespace('testHelpers', {
+    Refunds: require('./resources/TestHelpers/Refunds'),
     TestClocks: require('./resources/TestHelpers/TestClocks'),
+    Terminal: resourceNamespace('terminal', {
+      Readers: require('./resources/TestHelpers/Terminal/Readers'),
+    }),
   }),
 };

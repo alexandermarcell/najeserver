@@ -1,33 +1,32 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/userModel');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 
 //Register New User
 //public
 //Post request
-const registerUser = asyncHandler( async(req, res) => {
-    const { name, phone, address, email, password} = req.body
 
-    if (!name  || !phone || !address || !email || !password){
-        res.status(400).json({
-            'message': "Please add all fields"
-        })
+const registerUser =  asyncHandler(async (req, res) => {
+    const { name, phone, address, email, password } = new User(req.body)
+
+    console.log('inputs',req.body)
+
+    if( !name || !phone || !address || !email || !password ) {
+        res.status(400)
+        throw new Error('Please add all fields')
     }
 
-    //check if user exists
-    const userExists = await User.findOne({
-        email
-    })
+    const userExist = await User.findOne({email});
 
-    if (userExists){
-        res.status(400).json({
-            'message': 'user already exists'
-        })
+    if(userExist){
+        res.status(400)
+        throw new Error('User already exists')
     }
+    console.log('already Exists? : ',userExist)
 
-    //hashed password
+    //hash the pasword
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -39,74 +38,113 @@ const registerUser = asyncHandler( async(req, res) => {
         email,
         password: hashedPassword
     })
+    console.log('new User: ', user)
 
-    if(user){
+    if(user) {
         res.status(201).json({
             _id: user.id,
+            name: user.name,
+            phone: user.phone,
+            email: user.email,
+            address: user.address,
+            token: generateToken(user._id)
+        })
+    } else {
+        res.status(400)
+        throw new Error('Invalid user data')
+    }
+})
+
+//loginUser
+//Public
+//Post
+
+const loginUser =  asyncHandler( async(req, res) => {
+
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if(user && (bcrypt.compare(password, user.password))) {
+        res.status(200).json({
+            _id: user._id,
             name: user.name,
             phone: user.phone,
             address: user.address,
             email: user.email,
             token: generateToken(user._id)
         })
-    }
-    else{
+    } else {
         res.status(400).json({
-            'message':'Invalid User data'
+            "message":"Something Went Wrong"
         })
     }
 })
 
-
-//Register New User
-//Public
-//Post
-const loginUser = asyncHandler( async(req, res) => {
-    const { email, password } = req.body;
-
-    //verify email
-    const user = await User.findOne({email});
-
-    if(user && (await bcrypt.compare(password, user.password))){
-        res.json({
-            _id: user.id,
-            name: user.name,
-            email: user.email,
-            token: generateToken(user._id),
+const logOutUser =  asyncHandler(async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter((tokens) => {
+            return token.token !== req.token
         })
-    } else {
-        res.status(400).json({
-            'message':'Invalid credentials'
-        })
+        await req.user.save()
+        res.send()
+    } catch (error) {
+        res.status(500).send()
     }
+})
 
-    res.json({
-        message: 'Login User'
-    })
+const logOutAll = asyncHandler(async (req, res) => {
+    try {
+        req.user.tokens = []
+        await req.user.save()
+        res.send()
+    } catch (error) {
+        res.status(500).send()
+    }
 })
 
 //Register New User
 //Private
 //get
 const getMe = asyncHandler( async(req, res) => {
-    const { _id, name, email } = await User.findById(req.user.id)
+    const { _id, name, email, phone, address, token } = await User.findById(req.user.id)
 
     res.status(200).json({
         id: _id,
         name,
         email,
+        phone,
+        address,
+        token,
     })
 })
 
-//Generate JWT
-const generateToken = (id) => {
-    return jwt.sign({id}, process.env.JWT_SECRET, {
-        expiresIn: '120d'
-    })
-}
 
 module.exports = {
     registerUser,
     loginUser,
+    logOutUser,
+    logOutAll,
     getMe,
+}
+
+//generate token
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: '180d',
+    })
+}
+
+function isLoggedIn(req, res, next) {
+    if(req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/');
+}
+
+function notLoggedIn(req, res, next) {
+    if(!req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/');
 }
