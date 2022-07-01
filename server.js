@@ -43,7 +43,9 @@ app.use(function(req, res, next) {
   
 require('dotenv').config({ path: './.env' });
 
-app.use(express.json());
+app.use(express.json({
+    verify: (req, res, buffer) => req['rawBody'] = buffer,
+}));
 
 app.use(express.static("public"));
 
