@@ -2,7 +2,7 @@ const stripeAPI = require('../stripe');
 
 async function createCheckoutSession (req, res) {
 
-    const domainUrl = 'https://najestore.netlify.app/';
+    const domainUrl = 'https://najestore.netlify.app';
 
     const { line_items, customer_email } = req.body;
     console.log(req.body)
